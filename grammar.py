@@ -51,11 +51,6 @@ class Word(object):
     def __iter__(self):
         return iter(self.syllables)
 
-    def __str__(self):
-        print(self.__dict__)
-        return "!!!"
-        #return str(self)
-
     def __unicode__(self):
         return ''.join(self.syllables)
 
@@ -119,14 +114,11 @@ class Sentence(object):
         return self.words[self.min + i*2] # skip spaces
 
     def __len__(self):
-        return (self.max - self.min + 1) / 2
+        return (self.max - self.min + 1) // 2
 
     def __iter__(self):
         for i in range(len(self)):
             yield self[i]
-
-    def __str__(self):
-        return str(self).encode('utf_8')
 
     def __unicode__(self):
         return ''.join((str(i) for i in self.words))
