@@ -1,7 +1,7 @@
 import math
-import prob
+import butter.prob as prob
 import re
-import grammar
+import butter.grammar as grammar
 
 class Scorer(object):
     class Score(tuple):

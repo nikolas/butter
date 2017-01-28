@@ -1,6 +1,8 @@
 import re
 from collections import defaultdict
-from hyphenate import hyphenate_word
+from butter.hyphenate import hyphenate_word
+import functools
+
 
 class Word(object):
     """A class representing a single word in a sentence."""
@@ -19,7 +21,7 @@ class Word(object):
             i = m.start()
         chunks.append(text[i:])
 
-        self.syllables = reduce(lambda x, y: x + hyphenate_word(y), chunks, [])
+        self.syllables = functools.reduce(lambda x, y: x + hyphenate_word(y), chunks, [])
 
         # collapse any long runs of identical characters
         for run in runs:
@@ -50,7 +52,9 @@ class Word(object):
         return iter(self.syllables)
 
     def __str__(self):
-        return unicode(self).encode('utf_8')
+        print(self.__dict__)
+        return "!!!"
+        #return str(self)
 
     def __unicode__(self):
         return ''.join(self.syllables)
@@ -104,10 +108,10 @@ class Sentence(object):
                 self.words[token] = Unword(self.words[token])
             else:
                 self.words[token] = Word(self.words[token])
-                self.same_words[unicode(self.words[token]).lower()].append(word)
+                self.same_words[str(self.words[token]).lower()].append(word)
 
     def related(self, i):
-        return self.same_words[ unicode(self[i]).lower() ]
+        return self.same_words[ str(self[i]).lower() ]
 
     def __getitem__(self, i):
         if self.min + i*2 >= self.max:
@@ -122,16 +126,16 @@ class Sentence(object):
             yield self[i]
 
     def __str__(self):
-        return unicode(self).encode('utf_8')
+        return str(self).encode('utf_8')
 
     def __unicode__(self):
-        return ''.join((unicode(i) for i in self.words))
+        return ''.join((str(i) for i in self.words))
 
 plurals = {
     'men', 'women', 'feet', 'geese', 'teeth', 'lice', 'mice', 'children',
 }
 def is_plural(word):
-    word = unicode(word).lower()
+    word = str(word).lower()
     if word[-1] == 's' and word[-2] not in 'ius': return True
     return word in plurals
 
@@ -146,6 +150,6 @@ past_tense = {
     'tore', 'went', 'woke', 'won', 'wore', 'wrote',
 }
 def is_past_tense(word):
-    word = unicode(word).lower()
+    word = str(word).lower()
     if len(word) > 2 and word[-2:] == 'ed' and word[-3] not in 'ae': return True
     return word in past_tense
