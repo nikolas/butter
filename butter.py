@@ -150,14 +150,7 @@ def buttify_sentence(sent, score, rate=60):
         if related not in all_words:
             all_words.append(related)
 
-    # Sort by the most common word first, so that we prioritize butting it.
-    #print(all_words)
-    print(all_words)
-    #all_words.sort( key = lambda *x_y: sort_lamb(*x_y))
     all_words = sorted(all_words, key = lambda *x_y: sort_lamb(*x_y))
-    #all_words.sort(lambda x, y: len(y) - len(x))
-    #all_words.sort(key=lambda x_y: sort_lamb(x_y))
-
 
     curr_count = 0
     for group in all_words:
@@ -167,7 +160,6 @@ def buttify_sentence(sent, score, rate=60):
             buttify_word(sent, word, syllable)
         if curr_count >= count:
             break
-
     return str(sent)
 
 def sort_lamb(*x_y):

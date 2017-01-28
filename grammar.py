@@ -51,8 +51,8 @@ class Word(object):
     def __iter__(self):
         return iter(self.syllables)
 
-    def __unicode__(self):
-        return ''.join(self.syllables)
+    def __str__(self):
+        return str(''.join(self.syllables))
 
 class Unword(Word):
     """A class representing a non-word string of characters in a sentence (e.g.
@@ -120,8 +120,8 @@ class Sentence(object):
         for i in range(len(self)):
             yield self[i]
 
-    def __unicode__(self):
-        return ''.join((str(i) for i in self.words))
+    def __str__(self):
+        return str(''.join((str(i) for i in self.words)))
 
 plurals = {
     'men', 'women', 'feet', 'geese', 'teeth', 'lice', 'mice', 'children',
