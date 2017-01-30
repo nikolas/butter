@@ -22,11 +22,8 @@ def lookup(p, k):
             lo = mid
 
 def weighted_sample(weights, k):
-    print("Weights")
     if len(weights) is 1:
         return
-    print(weights)
-    print("k %s" % k)
     """Return a list of k choices in the range [0, len(weights)) with the
     probabilities specified in weights"""
     cum = [0]+cumsum(weights)
