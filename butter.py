@@ -1,7 +1,8 @@
 import math
-import prob
+import butter.prob as prob
 import re
-import grammar
+import butter.grammar as grammar
+from functools import reduce
 
 class Scorer(object):
     class Score(tuple):
@@ -48,7 +49,7 @@ class Scorer(object):
 
             # words after good pre-words
             if i > 0:
-                prev = unicode(sent[i-1]).lower()
+                prev = str(sent[i-1]).lower()
                 if prev in self.good_prewords:
                     words[i].total += 5
 
@@ -57,15 +58,15 @@ class Scorer(object):
             words[i].total = int(words[i].total * factor)
 
         if len(words) >= min_words:
-            score = int(reduce(lambda x, y: x+y.total, words, 0) /
+            score = int(reduce(lambda x, y: x+y.total, words, 0) //
                         (len(words) ** 0.75))
         else:
             score = 0
         return self.Score(score, words)
 
     def _score_word(self, word):
-        if (len(unicode(word)) < 3 or
-            unicode(word).lower() in self.block_words or
+        if (len(str(word)) < 3 or
+            str(word).lower() in self.block_words or
             isinstance(word, grammar.Unword)):
             return self.Score(0, [])
 
@@ -77,7 +78,7 @@ class Scorer(object):
             elif word[i+1][0].lower() == 't':
                 sylls[i] += 1
 
-        score = int(sum(sylls) / math.sqrt(len(sylls)))
+        score = int(sum(sylls) // math.sqrt(len(sylls)))
         if score == 0:
             return self.Score(0, [])
 
@@ -140,7 +141,7 @@ def score_sentence(text, scorer=Scorer, min_words=2):
     return sent, score
 
 def buttify_sentence(sent, score, rate=60):
-    count = min(sum(score.word())/rate+1, max(len(sent)/4, 1))
+    count = min(sum(score.word())//rate+1, max(len(sent)//4, 1))
     word_indices = prob.weighted_sample(score.word(), count)
 
     # Get all the instances of the words we randomly selected.
@@ -149,8 +150,7 @@ def buttify_sentence(sent, score, rate=60):
         if related not in all_words:
             all_words.append(related)
 
-    # Sort by the most common word first, so that we prioritize butting it.
-    all_words.sort(lambda x, y: len(y) - len(x))
+    all_words = sorted(all_words, key = lambda *x_y: sort_lamb(*x_y))
 
     curr_count = 0
     for group in all_words:
@@ -160,8 +160,13 @@ def buttify_sentence(sent, score, rate=60):
             buttify_word(sent, word, syllable)
         if curr_count >= count:
             break
+    return str(sent)
 
-    return unicode(sent)
+def sort_lamb(*x_y):
+    if len(x_y) is 1:
+      return -1
+
+    return len(x_y[1]) - len(x_y[0])
 
 def buttify_word(sentence, word, syllable):
     butt = 'butt'
@@ -172,9 +177,9 @@ def buttify_word(sentence, word, syllable):
         butt = 'b' + 'u'*(m.end() - m.start()) + 'tt'
 
     if syllable == len(sentence[word])-1:
-        if grammar.is_plural(unicode(sentence[word])):
+        if grammar.is_plural(str(sentence[word])):
             butt += 's'
-        elif grammar.is_past_tense(unicode(sentence[word])):
+        elif grammar.is_past_tense(str(sentence[word])):
             butt += 'ed'
 
     if sentence[word][syllable].isupper():
@@ -190,7 +195,7 @@ def buttify_word(sentence, word, syllable):
         sentence[word][syllable] = sentence[word][syllable][:-1]
 
     # if this is the first syllable and the previous word is "an", fix it
-    if syllable == 0 and word > 0 and unicode(sentence[word-1]).lower() == 'an':
+    if syllable == 0 and word > 0 and str(sentence[word-1]).lower() == 'an':
         sentence[word-1][0] = sentence[word-1][0][0:1]
 
 def buttify(text, scorer=Scorer, rate=60, min_words=2):
